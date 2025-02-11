@@ -19,19 +19,20 @@ def extract_text(html):
     return "\n".join(spans)
 
 def extract_names_and_orgs(text):
-    """Extract names and organizations from text, with or without titles."""
+    """Extract names and organizations using a more flexible pattern."""
     people = []
     lines = text.split('\n')
 
     for line in lines:
         match = re.match(
-            r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow| Adjunct Associate Professor| Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
-            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|from)\s+([A-Za-z\s\-&]+)',  # Name + Organization
+            r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Optional title
+            r'([A-Za-z-\.\s]+?)'  # Name
+            r'(?:\s+is.*?(?:at|from)\s+([A-Za-z\s\-&]+))?',  # Optional organization
             line
         )
         if match:
             name = match.group(1).strip()
-            organization = match.group(2).strip()
+            organization = match.group(2).strip() if match.group(2) else "Unknown"
             people.append((name, organization))
 
     return people
