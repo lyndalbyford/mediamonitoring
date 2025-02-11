@@ -1,4 +1,3 @@
-import streamlit as st
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -10,30 +9,27 @@ def fetch_webpage(url):
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:
-        return None
+        return f"Error fetching webpage: {e}"
 
 def extract_text(html):
-    """Extract full content from <span class='expert-title-sentence'>."""
+    """Extract full content from <span class='expert-title-sentence'> and display it."""
     soup = BeautifulSoup(html, "html.parser")
     spans = [span.get_text(strip=True) for span in soup.find_all("span", class_="expert-title-sentence")]
-    return "\n".join(spans)
+    extracted_text = "\n".join(spans)  # Join with new lines for readability
+    return extracted_text
 
 def extract_names_and_orgs(text):
-    """Extract names and organizations from text, with or without titles."""
+    """Extract names and organizations from text, including those without titles."""
     people = []
     lines = text.split('\n')
-
+    
     for line in lines:
-        match = re.match(
-            r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow| Adjunct Associate Professor| Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
-            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|from)\s+([A-Za-z\s\-&]+)',  # Name + Organization
-            line
-        )
+        match = re.match(r'(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)?\s*([A-Za-z-\.\s]+?)\s+is.*?(?:at|from)\s+([A-Za-z\s\-]+)', line)
         if match:
             name = match.group(1).strip()
             organization = match.group(2).strip()
             people.append((name, organization))
-
+    
     return people
 
 def generate_boolean_search(people):
@@ -52,22 +48,21 @@ def generate_boolean_search(people):
     
     return boolean_query, name_only_query
 
-# Streamlit UI
-st.title("Boolean Search Generator")
-
-url = st.text_input("Enter Webpage URL")
-
-if st.button("Generate Boolean Search"):
+if __name__ == "__main__":
+    url = input("Enter the webpage URL: ")
     html = fetch_webpage(url)
-    if html:
+    
+    if html and not html.startswith("Error"):
         text = extract_text(html)
+        print("\nExtracted Text:")
+        print(text)
+        
+        # Extract data and generate Boolean search
         people = extract_names_and_orgs(text)
         boolean_query, name_only_query = generate_boolean_search(people)
-
-        st.subheader("Boolean Search Query")
-        st.code(boolean_query, language="text")
-
-        st.subheader("Name-Only Boolean Query")
-        st.code(name_only_query, language="text")
-    else:
-        st.error("Failed to fetch webpage.")
+        
+        print("\nBoolean Search Query:")
+        print(boolean_query)
+        
+        print("\nName-Only Boolean Query:")
+        print(name_only_query)
