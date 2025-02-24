@@ -26,7 +26,7 @@ def extract_names_and_orgs(text):
     for line in lines:
         match = re.match(
             r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
-            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|from|of)\s+([A-Za-z\s\-&]+)',  # Name + Organization
+            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|of)\s+([A-Za-z\s\-&]+)',  # Name + Organization
             line
         )
         if match:
@@ -53,7 +53,7 @@ def generate_boolean_search(people):
     return boolean_query, name_only_query
 
 # Streamlit UI
-st.title("Boolean Search Generator")
+st.title("Lyndal's Media Monitoring Boolean Search Generator for ERs")
 
 url = st.text_input("Enter Webpage URL")
 
