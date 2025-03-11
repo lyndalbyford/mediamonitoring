@@ -26,7 +26,7 @@ def extract_names_and_orgs(text):
     for line in lines:
         match = re.match(
             r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
-            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at)\s+([A-Za-z\s\-&]+)',  # Name + Organization
+            r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|at the)\s+([A-Za-z\s\-&]+)',  # Name + Organization
             line
         )
         if match:
