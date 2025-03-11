@@ -19,7 +19,7 @@ def extract_text(html):
     return "\n".join(spans)
 
 def extract_names_and_orgs(text):
-    """Extract names and organizations from text, with or without titles."""
+    """Extract names and organizations from text."""
     people = []
     lines = text.split('\n')
 
@@ -43,6 +43,7 @@ def generate_boolean_search(people):
     
     for name, org in people:
         first_name = name.split()[0]
+        org = re.sub(r'^The\s+', '', org, flags=re.IGNORECASE)  # Remove 'The' at the start of organization name
         search_part = f'(medium:Radio AND (("{name}" OR (("{first_name}") NEAR/10 ("{org}")))))'
         boolean_parts.append(search_part)
         name_only_parts.append(f'"{name}"')
