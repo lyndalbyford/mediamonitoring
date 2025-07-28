@@ -13,9 +13,9 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract full content from <span class='expert-title-sentence'>."""
+    """Extract full content from <span class='component expert-reaction'>."""
     soup = BeautifulSoup(html, "html.parser")
-    spans = [span.get_text(strip=True) for span in soup.find_all("span", class_="expert-title-sentence")]
+    spans = [span.get_text(strip=True) for span in soup.find_all("span", class_="component expert-reaction")]
     return "\n".join(spans)
 
 def extract_names_and_orgs(text):
@@ -25,7 +25,7 @@ def extract_names_and_orgs(text):
 
     for line in lines:
         match = re.match(
-            r'(?:(?:Dr|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
+            r'(?:(?:Dr|Emeritus Professor|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
             r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|at the)\s+([A-Za-z\s\-&]+)',  # Name + Organization
             line
         )
