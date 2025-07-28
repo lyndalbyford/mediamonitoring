@@ -13,10 +13,10 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract full content from <span class='component expert-reaction'>."""
+    """Extract full content from <div class='reaction'>."""
     soup = BeautifulSoup(html, "html.parser")
-    spans = [span.get_text(strip=True) for span in soup.find_all("span", class_="component expert-reaction")]
-    return "\n".join(spans)
+    divs = [div.get_text(strip=True) for div in soup.find_all("div", class_="reaction")]
+    return "\n".join(divs)
 
 def extract_names_and_orgs(text):
     """Extract names and organizations from text."""
