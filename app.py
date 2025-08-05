@@ -13,19 +13,17 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract text from <div class='reaction'> excluding <div class='reaction_content'>."""
+    """Extract full content from <div class='reaction'>, excluding <div class='reaction_content'>."""
     soup = BeautifulSoup(html, "html.parser")
-    text_blocks = []
-    for div in soup.find_all("div", class_="reaction"):
-        content = []
-        for child in div.children:
-            if isinstance(child, str):
-                continue
-            if child.name == "div" and "reaction_content" in child.get("class", []):
-                continue  # Skip reaction_content blocks entirely
-            content.append(child.get_text(strip=True))
-        text_blocks.append(" ".join(content))
-    return "\n".join(text_blocks)
+    cleaned_texts = []
+
+    for reaction_div in soup.find_all("div", class_="reaction"):
+        # Remove nested <div class="reaction_content"> if present
+        for nested in reaction_div.find_all("div", class_="reaction_content"):
+            nested.decompose()
+        cleaned_texts.append(reaction_div.get_text(strip=True))
+
+    return "\n".join(cleaned_texts)
 
 def extract_names_and_orgs(text):
     """Extract names and organizations from text."""
