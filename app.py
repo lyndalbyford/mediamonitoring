@@ -13,10 +13,10 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract full content from <div class='reaction'>."""
+    """Extract full content from <h4> elements."""
     soup = BeautifulSoup(html, "html.parser")
-    divs = [div.get_text(strip=True) for div in soup.find_all("div", class_="reaction")]
-    return "\n".join(divs)
+    headers = [h.get_text(strip=True) for h in soup.find_all("h4")]
+    return "\n".join(headers)
 
 def extract_names_and_orgs(text):
     """Extract names and organizations from text."""
@@ -25,7 +25,7 @@ def extract_names_and_orgs(text):
 
     for line in lines:
         match = re.match(
-            r'(?:(?:Dr|Emeritus Professor|Scientia Professor|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
+            r'(?:(?:Dr|Emeritus Professor|Professor|Associate Professor|Mr|Ms|Distinguished Professor|Honorary Fellow|Adjunct Associate Professor|Adjunct Professor|Adjunct Assoc Prof)\s+)?'  # Title is now optional
             r'([A-Za-z-\.\s]+?)\s+is.*?(?:at|at the)\s+([A-Za-z\s\-&]+)',  # Name + Organization
             line
         )
