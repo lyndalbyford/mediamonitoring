@@ -13,10 +13,19 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract full content from <h4> elements."""
+    """Extract text from <div class='reaction'> but stop at <div class='reaction_content'>."""
     soup = BeautifulSoup(html, "html.parser")
-    headers = [h.get_text(strip=True) for h in soup.find_all("h4")]
-    return "\n".join(headers)
+    text_blocks = []
+    for div in soup.find_all("div", class_="reaction"):
+        content = []
+        for child in div.children:
+            if isinstance(child, str):
+                continue
+            if child.name == "div" and "reaction_content" in child.get("class", []):
+                break
+            content.append(child.get_text(strip=True))
+        text_blocks.append(" ".join(content))
+    return "\n".join(text_blocks)
 
 def extract_names_and_orgs(text):
     """Extract names and organizations from text."""
@@ -40,17 +49,17 @@ def generate_boolean_search(people):
     """Generate a Boolean search query."""
     boolean_parts = []
     name_only_parts = []
-    
+
     for name, org in people:
         first_name = name.split()[0]
         org = re.sub(r'^The\s+', '', org, flags=re.IGNORECASE)  # Remove 'The' at the start of organization name
         search_part = f'(medium:Radio AND (("{name}" OR (("{first_name}") NEAR/10 ("{org}")))))'
         boolean_parts.append(search_part)
         name_only_parts.append(f'"{name}"')
-    
+
     boolean_query = ' OR \n'.join(boolean_parts)
     name_only_query = ' OR '.join(name_only_parts)
-    
+
     return boolean_query, name_only_query
 
 # Streamlit UI
