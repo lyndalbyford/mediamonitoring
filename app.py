@@ -13,7 +13,7 @@ def fetch_webpage(url):
         return None
 
 def extract_text(html):
-    """Extract text from <div class='reaction'> but stop at <div class='reaction_content'>."""
+    """Extract text from <div class='reaction'> excluding <div class='reaction_content'>."""
     soup = BeautifulSoup(html, "html.parser")
     text_blocks = []
     for div in soup.find_all("div", class_="reaction"):
@@ -22,7 +22,7 @@ def extract_text(html):
             if isinstance(child, str):
                 continue
             if child.name == "div" and "reaction_content" in child.get("class", []):
-                break
+                continue  # Skip reaction_content blocks entirely
             content.append(child.get_text(strip=True))
         text_blocks.append(" ".join(content))
     return "\n".join(text_blocks)
