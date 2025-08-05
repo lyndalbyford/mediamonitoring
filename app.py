@@ -9,21 +9,22 @@ def fetch_webpage(url):
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         return response.text
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
         return None
 
 def extract_text(html):
-    """Extract full content from <div class='reaction'>, excluding <div class='reaction_content'>."""
+    """Extract content from <div class='reaction'> but exclude <div class='reaction_content'> inside it."""
     soup = BeautifulSoup(html, "html.parser")
-    cleaned_texts = []
+    extracted_texts = []
 
     for reaction_div in soup.find_all("div", class_="reaction"):
-        # Remove nested <div class="reaction_content"> if present
-        for nested in reaction_div.find_all("div", class_="reaction_content"):
-            nested.decompose()
-        cleaned_texts.append(reaction_div.get_text(strip=True))
+        # Remove any nested <div class="reaction_content"> from this reaction_div
+        for content_div in reaction_div.find_all("div", class_="reaction_content"):
+            content_div.decompose()
 
-    return "\n".join(cleaned_texts)
+        extracted_texts.append(reaction_div.get_text(strip=True))
+
+    return "\n".join(extracted_texts)
 
 def extract_names_and_orgs(text):
     """Extract names and organizations from text."""
@@ -50,7 +51,7 @@ def generate_boolean_search(people):
 
     for name, org in people:
         first_name = name.split()[0]
-        org = re.sub(r'^The\s+', '', org, flags=re.IGNORECASE)  # Remove 'The' at the start of organization name
+        org = re.sub(r'^The\s+', '', org, flags=re.IGNORECASE)  # Remove 'The' at the start
         search_part = f'(medium:Radio AND (("{name}" OR (("{first_name}") NEAR/10 ("{org}")))))'
         boolean_parts.append(search_part)
         name_only_parts.append(f'"{name}"')
